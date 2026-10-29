@@ -834,7 +834,7 @@ class _QuickQuizPageState extends State<QuickQuizPage> {
                       ),
                     ),
                   ],
-                ],
+                ]
               ),
       ),
     );
@@ -1069,3 +1069,4 @@ void showAppMessage(BuildContext context, String message) {
     SnackBar(content: Text(message)),
   );
 }
+ 

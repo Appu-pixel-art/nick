@@ -1,13 +1,36 @@
- 
-import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const DartChatApp());
-}
+import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart'
+    hide PhoneAuthProvider;
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
+import 'package:firebase_ui_oauth_facebook/firebase_ui_oauth_facebook.dart';
+
+import 'firebase_options.dart';
 
 const Color green = Color(0xFF075E54);
 const Color lightGreen = Color(0xFFDCF8C6);
 const Color chatBg = Color(0xFFECE5DD);
+
+const String googleClientId = 'YOUR_GOOGLE_WEB_CLIENT_ID';
+const String facebookAppId = 'YOUR_FACEBOOK_APP_ID';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  FirebaseUIAuth.configureProviders([
+    GoogleProvider(clientId: googleClientId),
+    FacebookProvider(clientId: facebookAppId),
+    PhoneAuthProvider(),
+  ]);
+
+  runApp(const DartChatApp());
+}
 
 class DartChatApp extends StatelessWidget {
   const DartChatApp({super.key});
@@ -21,11 +44,112 @@ class DartChatApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: green),
         useMaterial3: true,
       ),
-      home: const HomePage(),
+      routes: {
+        '/phone': (context) => PhoneInputScreen(
+              actions: [
+                SMSCodeRequestedAction(
+                  (context, action, flowKey, phoneNumber) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => SMSCodeInputScreen(
+                          flowKey: flowKey,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+      },
+      home: const LoginGate(),
     );
   }
 }
 
+// Checks whether the user is signed in.
+class LoginGate extends StatelessWidget {
+  const LoginGate({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (snapshot.hasError) {
+          return const Scaffold(
+            body: Center(child: Text('Unable to check login.')),
+          );
+        }
+
+        if (snapshot.data != null) {
+          return const HomePage();
+        }
+
+        return const LoginPage();
+      },
+    );
+  }
+}
+
+// Firebase UI login screen.
+class LoginPage extends StatelessWidget {
+  const LoginPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: SignInScreen(
+          actions: [
+            VerifyPhoneAction((context, _) {
+              Navigator.of(context).pushNamed('/phone');
+            }),
+          ],
+          headerBuilder: (context, constraints, _) {
+            return const Padding(
+              padding: EdgeInsets.all(24),
+              child: Column(
+                children: [
+                  CircleAvatar(
+                    radius: 42,
+                    backgroundColor: green,
+                    child: Icon(
+                      Icons.chat,
+                      size: 46,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Welcome to DartChat',
+                    style: TextStyle(
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Sign in to chat with your friends',
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+// Contact model.
 class Contact {
   final String name;
   final String message;
@@ -53,6 +177,7 @@ const List<Contact> contacts = [
   Contact('Santhosh', 'Okay bro', 'Yesterday', Colors.indigo),
 ];
 
+// Main app with four tabs.
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -81,28 +206,23 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              setState(() => selectedTab = 0);
+            icon: const Icon(Icons.logout),
+            tooltip: 'Sign out',
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
             },
-          ),
-          IconButton(
-            icon: const Icon(Icons.more_vert),
-            onPressed: () =>
-                showMessage(context, 'DartChat menu'),
           ),
         ],
       ),
-
-      // Main screen changes according to the selected tab.
       body: selectedTab == 0
           ? Column(
               children: [
                 Padding(
                   padding: const EdgeInsets.all(12),
                   child: TextField(
-                    onChanged: (value) =>
-                        setState(() => search = value),
+                    onChanged: (value) {
+                      setState(() => search = value);
+                    },
                     decoration: InputDecoration(
                       hintText: 'Search contacts...',
                       prefixIcon: const Icon(Icons.search),
@@ -118,21 +238,17 @@ class _HomePageState extends State<HomePage> {
                 Expanded(
                   child: ListView(
                     children: [
-                      ListTile(
-                        leading: const CircleAvatar(
+                      const ListTile(
+                        leading: CircleAvatar(
                           backgroundColor: green,
                           child: Icon(Icons.group_add,
                               color: Colors.white),
                         ),
-                        title: const Text('New group'),
-                        onTap: () => showMessage(
-                            context, 'New group selected'),
+                        title: Text('New group'),
+                        subtitle: Text('Create a group chat'),
                       ),
                       for (final contact in filtered)
                         ListTile(
-                          contentPadding:
-                              const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 4),
                           leading: CircleAvatar(
                             radius: 27,
                             backgroundColor: contact.color,
@@ -152,15 +268,12 @@ class _HomePageState extends State<HomePage> {
                           ),
                           subtitle: Text(contact.message),
                           trailing: Column(
-                            mainAxisAlignment:
-                                MainAxisAlignment.center,
-                            crossAxisAlignment:
-                                CrossAxisAlignment.end,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
                                 contact.time,
-                                style:
-                                    const TextStyle(fontSize: 11),
+                                style: const TextStyle(fontSize: 11),
                               ),
                               if (contact.unread > 0) ...[
                                 const SizedBox(height: 5),
@@ -195,10 +308,7 @@ class _HomePageState extends State<HomePage> {
             )
           : selectedTab == 1
               ? const Center(
-                  child: Text(
-                    'No new status updates',
-                    style: TextStyle(color: Colors.grey),
-                  ),
+                  child: Text('No new status updates'),
                 )
               : selectedTab == 2
                   ? ListView(
@@ -213,29 +323,26 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                             title: Text(c.name),
-                            subtitle: const Text('Tap to call'),
-                            onTap: () => showMessage(
-                              context,
-                              'Calling is not connected yet',
+                            subtitle: const Text(
+                              'Calling is not connected',
                             ),
                           ),
                       ],
                     )
                   : const ProfilePage(),
-
       floatingActionButton: selectedTab == 0
           ? FloatingActionButton(
               backgroundColor: green,
               foregroundColor: Colors.white,
-              onPressed: () => showMessage(
-                context,
-                'Select a contact to start chatting',
-              ),
+              onPressed: () {
+                showMessage(
+                  context,
+                  'Select a contact to start chatting',
+                );
+              },
               child: const Icon(Icons.chat),
             )
           : null,
-
-      // Four navigation tabs, including Profile.
       bottomNavigationBar: NavigationBar(
         selectedIndex: selectedTab,
         onDestinationSelected: (index) {
@@ -272,6 +379,7 @@ class ChatMessage {
   ChatMessage(this.text, this.isMe, this.time);
 }
 
+// Individual chat screen.
 class ChatPage extends StatefulWidget {
   final Contact contact;
 
@@ -287,9 +395,9 @@ class _ChatPageState extends State<ChatPage> {
   final List<ChatMessage> messages = [
     ChatMessage('Hi!', false, '9:00 AM'),
     ChatMessage('yenna pandra machii', true, '9:01 AM'),
-    ChatMessage('saptiyaa', true, '9:02 AM'), // Fixed: comma added
+    ChatMessage('saptiyaa', true, '9:02 AM'),
     ChatMessage('summadha iruka. Thank you!', false, '9:03 AM'),
-    ChatMessage('hmm', true, '9:04 AM')
+    ChatMessage('hmm', true, '9:04 AM'),
   ];
 
   void sendMessage() {
@@ -331,18 +439,9 @@ class _ChatPageState extends State<ChatPage> {
             ),
             const SizedBox(width: 10),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.contact.name,
-                    style: const TextStyle(fontSize: 17),
-                  ),
-                  const Text(
-                    'Tap here for contact info',
-                    style: TextStyle(fontSize: 11),
-                  ),
-                ],
+              child: Text(
+                widget.contact.name,
+                style: const TextStyle(fontSize: 18),
               ),
             ),
           ],
@@ -351,7 +450,9 @@ class _ChatPageState extends State<ChatPage> {
           IconButton(
             icon: const Icon(Icons.call),
             onPressed: () => showMessage(
-                context, 'Calling is not connected yet'),
+              context,
+              'Calling is not connected yet',
+            ),
           ),
         ],
       ),
@@ -375,12 +476,10 @@ class _ChatPageState extends State<ChatPage> {
                         maxWidth:
                             MediaQuery.of(context).size.width * 0.78,
                       ),
-                      margin:
-                          const EdgeInsets.symmetric(vertical: 5),
+                      margin: const EdgeInsets.symmetric(vertical: 5),
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color:
-                            msg.isMe ? lightGreen : Colors.white,
+                        color: msg.isMe ? lightGreen : Colors.white,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Column(
@@ -391,25 +490,12 @@ class _ChatPageState extends State<ChatPage> {
                             style: const TextStyle(fontSize: 16),
                           ),
                           const SizedBox(height: 4),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                msg.time,
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                              if (msg.isMe) ...[
-                                const SizedBox(width: 4),
-                                const Icon(
-                                  Icons.done_all,
-                                  size: 14,
-                                  color: Colors.blue,
-                                ),
-                              ],
-                            ],
+                          Text(
+                            msg.time,
+                            style: const TextStyle(
+                              fontSize: 10,
+                              color: Colors.grey,
+                            ),
                           ),
                         ],
                       ),
@@ -432,13 +518,10 @@ class _ChatPageState extends State<ChatPage> {
                         onSubmitted: (_) => sendMessage(),
                         decoration: InputDecoration(
                           hintText: 'Type a message',
-                          prefixIcon:
-                              const Icon(Icons.emoji_emotions),
                           filled: true,
                           fillColor: Colors.grey.shade100,
                           border: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.circular(28),
+                            borderRadius: BorderRadius.circular(28),
                             borderSide: BorderSide.none,
                           ),
                         ),
@@ -452,7 +535,6 @@ class _ChatPageState extends State<ChatPage> {
                         icon: const Icon(
                           Icons.send,
                           color: Colors.white,
-                          size: 20,
                         ),
                       ),
                     ),
@@ -467,6 +549,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 }
 
+// Profile screen.
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
@@ -511,16 +594,10 @@ class _ProfilePageState extends State<ProfilePage> {
       padding: const EdgeInsets.all(20),
       children: [
         const SizedBox(height: 20),
-        const Center(
-          child: CircleAvatar(
-            radius: 48,
-            backgroundColor: green,
-            child: Icon(
-              Icons.person,
-              size: 55,
-              color: Colors.white,
-            ),
-          ),
+        const CircleAvatar(
+          radius: 48,
+          backgroundColor: green,
+          child: Icon(Icons.person, size: 55, color: Colors.white),
         ),
         const SizedBox(height: 16),
         Center(
@@ -534,57 +611,34 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
         const SizedBox(height: 6),
         Center(
-          child: Text(
-            bio,
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: Colors.grey),
-          ),
+          child: Text(bio, textAlign: TextAlign.center),
         ),
         const SizedBox(height: 28),
-        const Text(
-          'Edit your profile',
-          style: TextStyle(
-            fontSize: 19,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 16),
         TextField(
           controller: usernameController,
           maxLength: 30,
           decoration: const InputDecoration(
             labelText: 'Username',
-            hintText: 'Enter your username',
-            prefixIcon: Icon(Icons.person_outline),
             border: OutlineInputBorder(),
           ),
         ),
-        const SizedBox(height: 12),
         TextField(
           controller: bioController,
           maxLength: 150,
           maxLines: 3,
           decoration: const InputDecoration(
             labelText: 'Bio',
-            hintText: 'Tell people something about yourself',
-            prefixIcon: Icon(Icons.info_outline),
             border: OutlineInputBorder(),
           ),
         ),
-        const SizedBox(height: 12),
         SwitchListTile(
-          contentPadding: EdgeInsets.zero,
           title: const Text('Private profile'),
-          subtitle: const Text(
-            'Privacy setting (demo only)',
-          ),
+          subtitle: const Text('Demo setting only'),
           value: isPrivate,
-          activeTrackColor: green,
           onChanged: (value) {
             setState(() => isPrivate = value);
           },
         ),
-        const SizedBox(height: 20),
         ElevatedButton.icon(
           onPressed: saveProfile,
           icon: const Icon(Icons.save),
@@ -592,7 +646,6 @@ class _ProfilePageState extends State<ProfilePage> {
           style: ElevatedButton.styleFrom(
             backgroundColor: green,
             foregroundColor: Colors.white,
-            padding: const EdgeInsets.all(15),
           ),
         ),
       ],

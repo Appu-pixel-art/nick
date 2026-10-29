@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 
 void main() {
@@ -268,30 +267,36 @@ class _HomePageState extends State<HomePage> {
               if (value == 'profile') {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const ProfilePage()),
+                  MaterialPageRoute(
+                    builder: (_) => const ProfilePage(),
+                  ),
                 );
               } else if (value == 'settings') {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const SettingsPage()),
-                );
-              } else if (value == 'logout') {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LoginPage()),
-                  (route) => false,
+                  MaterialPageRoute(
+                    builder: (_) => const SettingsPage(),
+                  ),
                 );
               }
             },
             itemBuilder: (_) => const [
-              PopupMenuItem(value: 'profile', child: Text('Profile')),
-              PopupMenuItem(value: 'settings', child: Text('Settings')),
-              PopupMenuItem(value: 'logout', child: Text('Log out')),
+              PopupMenuItem(
+                value: 'profile',
+                child: Text('Profile'),
+              ),
+              PopupMenuItem(
+                value: 'settings',
+                child: Text('Settings'),
+              ),
             ],
           ),
         ],
       ),
-      body: IndexedStack(index: selectedIndex, children: pages),
+      body: IndexedStack(
+        index: selectedIndex,
+        children: pages,
+      ),
       floatingActionButton: selectedIndex == 0
           ? FloatingActionButton(
               backgroundColor: appGreen,
@@ -348,11 +353,16 @@ class _HomePageState extends State<HomePage> {
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           subtitle: Text(messages[index]),
-          trailing: Text(times[index], style: const TextStyle(fontSize: 11)),
+          trailing: Text(
+            times[index],
+            style: const TextStyle(fontSize: 11),
+          ),
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => ChatPage(name: names[index])),
+              MaterialPageRoute(
+                builder: (_) => ChatPage(name: names[index]),
+              ),
             );
           },
         );
@@ -367,7 +377,10 @@ class _HomePageState extends State<HomePage> {
           ListTile(
             leading: CircleAvatar(
               backgroundColor: appGreen,
-              child: Text(name[0], style: const TextStyle(color: Colors.white)),
+              child: Text(
+                name[0],
+                style: const TextStyle(color: Colors.white),
+              ),
             ),
             title: Text(name),
             subtitle: const Text('Tap to call'),
@@ -377,6 +390,12 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
       ],
+    );
+  }
+
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
     );
   }
 }
@@ -395,11 +414,17 @@ class ClipsPage extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       children: [
         const Text(
-          'LOOPIX Clips',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          'DartChat Clips',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: 5),
-        const Text('Photos and moments', style: TextStyle(color: Colors.grey)),
+        const Text(
+          'Photos and moments',
+          style: TextStyle(color: Colors.grey),
+        ),
         const SizedBox(height: 16),
         Card(
           clipBehavior: Clip.antiAlias,
@@ -415,16 +440,21 @@ class ClipsPage extends StatelessWidget {
                   return Container(
                     height: 280,
                     color: Colors.grey.shade300,
-                    child: const Center(
-                      child: Icon(Icons.image_not_supported, size: 60),
+                    child: const Icon(
+                      Icons.image_not_supported,
+                      size: 60,
                     ),
+>>>>>>> 5d5c0bdd9a0fe8c6f4b31320e6a7d83fedd868cc
                   );
                 },
               ),
               const ListTile(
                 leading: CircleAvatar(
                   backgroundColor: appGreen,
-                  child: Icon(Icons.play_arrow, color: Colors.white),
+                  child: Icon(
+                    Icons.play_arrow,
+                    color: Colors.white,
+                  ),
                 ),
                 title: Text(
                   'LOOPIX Clips',
@@ -439,9 +469,9 @@ class ClipsPage extends StatelessWidget {
                     IconButton(
                       icon: const Icon(Icons.favorite_border),
                       onPressed: () {
-                        ScaffoldMessenger.of(
-                          context,
-                        ).showSnackBar(const SnackBar(content: Text('Liked!')));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Liked!')),
+                        );
                       },
                     ),
                     IconButton(
@@ -516,8 +546,7 @@ class _ChatPageState extends State<ChatPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.call),
-            onPressed: () =>
-                showAppMessage(context, 'Calling ${widget.name}...'),
+            onPressed: () => showAppMessage(context, 'Calling ${widget.name}...'),
           ),
           IconButton(
             icon: const Icon(Icons.videocam),
@@ -589,7 +618,11 @@ class ChatBubble extends StatelessWidget {
   final String text;
   final bool isSent;
 
-  const ChatBubble({super.key, required this.text, required this.isSent});
+  const ChatBubble({
+    super.key,
+    required this.text,
+    required this.isSent,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -633,8 +666,18 @@ class GamesPage extends StatelessWidget {
           Icons.numbers,
           const NumberGuessPage(),
         ),
-        gameTile(context, 'Quick Quiz', Icons.quiz, const QuickQuizPage()),
-        gameTile(context, 'Tic-Tac-Toe', Icons.grid_3x3, const TicTacToePage()),
+        _gameTile(
+          context,
+          'Quick Quiz',
+          Icons.quiz,
+          const QuickQuizPage(),
+        ),
+        _gameTile(
+          context,
+          'Tic-Tac-Toe',
+          Icons.grid_3x3,
+          const TicTacToePage(),
+        ),
       ],
     );
   }
@@ -651,7 +694,10 @@ class GamesPage extends StatelessWidget {
         title: Text(title),
         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
         onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => page));
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => page),
+          );
         },
       ),
     );
@@ -664,7 +710,8 @@ class RockPaperScissorsPage extends StatefulWidget {
   const RockPaperScissorsPage({super.key});
 
   @override
-  State<RockPaperScissorsPage> createState() => _RockPaperScissorsPageState();
+  State<RockPaperScissorsPage> createState() =>
+      _RockPaperScissorsPageState();
 }
 
 class _RockPaperScissorsPageState extends State<RockPaperScissorsPage> {
@@ -719,7 +766,10 @@ class _RockPaperScissorsPageState extends State<RockPaperScissorsPage> {
                 for (final choice in choices)
                   ElevatedButton(
                     onPressed: () => play(choice),
-                    child: Text(choice, style: const TextStyle(fontSize: 30)),
+                    child: Text(
+                      choice,
+                      style: const TextStyle(fontSize: 30),
+                    ),
                   ),
               ],
             ),
@@ -800,6 +850,17 @@ class _NumberGuessPageState extends State<NumberGuessPage> {
               result,
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 22),
+<<<<<<< HEAD
+            ),
+            const SizedBox(height: 20),
+            TextField(
+              controller: controller,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Your guess',
+                border: OutlineInputBorder(),
+              ),
+=======
             ),
             const SizedBox(height: 20),
             TextField(
@@ -811,8 +872,14 @@ class _NumberGuessPageState extends State<NumberGuessPage> {
               ),
             ),
             const SizedBox(height: 12),
-            ElevatedButton(onPressed: checkGuess, child: const Text('Check')),
-            TextButton(onPressed: restart, child: const Text('Play Again')),
+            ElevatedButton(
+              onPressed: checkGuess,
+              child: const Text('Check'),
+            ),
+            TextButton(
+              onPressed: restart,
+              child: const Text('Play Again'),
+            ),
           ],
         ),
       ),
@@ -894,11 +961,8 @@ class _QuickQuizPageState extends State<QuickQuizPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(
-                      Icons.emoji_events,
-                      size: 75,
-                      color: Colors.amber,
-                    ),
+                    const Icon(Icons.emoji_events,
+                        size: 75, color: Colors.amber),
                     const SizedBox(height: 16),
                     Text(
                       'Quiz completed!\nScore: $score/${questions.length}',
@@ -1032,7 +1096,10 @@ class _TicTacToePageState extends State<TicTacToePage> {
           children: [
             Text(
               result.isEmpty ? "Player $currentPlayer's turn" : result,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 20),
             SizedBox(
@@ -1040,7 +1107,8 @@ class _TicTacToePageState extends State<TicTacToePage> {
               child: GridView.builder(
                 shrinkWrap: true,
                 itemCount: 9,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                gridDelegate:
+                    const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
                 ),
                 itemBuilder: (context, index) {
@@ -1092,7 +1160,11 @@ class ProfilePage extends StatelessWidget {
             const CircleAvatar(
               radius: 55,
               backgroundColor: appGreen,
-              child: Icon(Icons.person, size: 60, color: Colors.white),
+              child: Icon(
+                Icons.person,
+                size: 60,
+                color: Colors.white,
+              ),
             ),
             const SizedBox(height: 16),
             const Text(
@@ -1103,8 +1175,7 @@ class ProfilePage extends StatelessWidget {
             const Text('Welcome to LOOPIX!'),
             const SizedBox(height: 20),
             ElevatedButton.icon(
-              onPressed: () =>
-                  showAppMessage(context, 'Edit profile coming soon!'),
+              onPressed: () => showAppMessage(context, 'Edit profile coming soon!'),
               icon: const Icon(Icons.edit),
               label: const Text('Edit Profile'),
             ),
@@ -1178,5 +1249,7 @@ class _SettingsPageState extends State<SettingsPage> {
 // ================= COMMON MESSAGE =================
 
 void showAppMessage(BuildContext context, String message) {
-  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text(message)),
+  );
 }

@@ -1,10 +1,10 @@
-<<<<<<< HEAD
-import 'dart:math';
-
-=======
 
 import 'dart:math';
->>>>>>> 5d5c0bdd9a0fe8c6f4b31320e6a7d83fedd868cc
+
+
+
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 void main() {

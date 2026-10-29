@@ -1,30 +1,202 @@
-
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const DartChatApp());
+  runApp(const LoopixApp());
 }
 
 const Color appGreen = Color(0xFF128C7E);
 const Color messageGreen = Color(0xFFDCF8C6);
 
-class DartChatApp extends StatelessWidget {
-  const DartChatApp({super.key});
+class LoopixApp extends StatelessWidget {
+  const LoopixApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'DartChat',
+      title: 'LOOPIX',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: appGreen),
         useMaterial3: true,
       ),
-      home: const HomePage(),
+      home: const LoginPage(),
     );
   }
 }
+
+// ================= LOGIN PAGE =================
+
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final phoneController = TextEditingController();
+
+  @override
+  void dispose() {
+    phoneController.dispose();
+    super.dispose();
+  }
+
+  void showMessage(String message) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  void continueWithPhone() {
+    final phone = phoneController.text.trim();
+
+    if (phone.length < 10) {
+      showMessage('Please enter a valid phone number.');
+      return;
+    }
+
+    // Demo login only. Real OTP verification is not configured.
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const HomePage()),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5FAF9),
+      appBar: AppBar(
+        backgroundColor: appGreen,
+        foregroundColor: Colors.white,
+        centerTitle: true,
+        title: const Text(
+          'LOOPIX',
+          style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 2),
+        ),
+      ),
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 420),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Icon(Icons.forum_rounded, color: appGreen, size: 82),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'LOOPIX',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 36,
+                      fontWeight: FontWeight.w900,
+                      color: appGreen,
+                      letterSpacing: 4,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Connect. Chat. Share.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16, color: Colors.black54),
+                  ),
+                  const SizedBox(height: 38),
+                  const Text(
+                    'Welcome to LOOPIX',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Choose how you want to continue',
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 28),
+
+                  // GOOGLE LOGIN
+                  OutlinedButton.icon(
+                    onPressed: () => showMessage(
+                      'Connect Google Authentication to enable sign-in.',
+                    ),
+                    icon: const Icon(
+                      Icons.g_mobiledata,
+                      size: 32,
+                      color: Colors.blue,
+                    ),
+                    label: const Text('Continue with Google'),
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(54),
+                      foregroundColor: Colors.black87,
+                      side: BorderSide(color: Colors.grey.shade400),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // PHONE LOGIN
+                  TextField(
+                    controller: phoneController,
+                    keyboardType: TextInputType.phone,
+                    maxLength: 15,
+                    decoration: const InputDecoration(
+                      counterText: '',
+                      prefixIcon: Icon(Icons.phone_android),
+                      labelText: 'Phone number',
+                      hintText: 'Enter your phone number',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  FilledButton.icon(
+                    onPressed: continueWithPhone,
+                    icon: const Icon(Icons.arrow_forward),
+                    label: const Text('Continue with phone number'),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: appGreen,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size.fromHeight(52),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // FACEBOOK LOGIN
+                  OutlinedButton.icon(
+                    onPressed: () => showMessage(
+                      'Connect Facebook Authentication to enable sign-in.',
+                    ),
+                    icon: const Icon(
+                      Icons.facebook,
+                      color: Color(0xFF1877F2),
+                      size: 28,
+                    ),
+                    label: const Text('Continue with Facebook'),
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(54),
+                      foregroundColor: Colors.black87,
+                      side: BorderSide(color: Colors.grey.shade400),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  const Text(
+                    'By continuing, you agree to the app terms '
+                    'and privacy policy.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.black45, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ================= HOME PAGE =================
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -63,68 +235,68 @@ class _HomePageState extends State<HomePage> {
     'Sunday',
   ];
 
+  void showMessage(String message) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+  }
+
   @override
   Widget build(BuildContext context) {
     final pages = [
-      _buildChats(),
+      buildChats(),
       const ClipsPage(),
       const GamesPage(),
-      _buildCalls(),
+      buildCalls(),
     ];
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: appGreen,
         foregroundColor: Colors.white,
+        centerTitle: true,
         title: const Text(
-          'DartChat',
+          'LOOPIX',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
-            onPressed: () => _showMessage('Search coming soon!'),
+            onPressed: () => showMessage('Search coming soon!'),
           ),
           PopupMenuButton<String>(
             onSelected: (value) {
               if (value == 'profile') {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => const ProfilePage(),
-                  ),
+                  MaterialPageRoute(builder: (_) => const ProfilePage()),
                 );
               } else if (value == 'settings') {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => const SettingsPage(),
-                  ),
+                  MaterialPageRoute(builder: (_) => const SettingsPage()),
+                );
+              } else if (value == 'logout') {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginPage()),
+                  (route) => false,
                 );
               }
             },
             itemBuilder: (_) => const [
-              PopupMenuItem(
-                value: 'profile',
-                child: Text('Profile'),
-              ),
-              PopupMenuItem(
-                value: 'settings',
-                child: Text('Settings'),
-              ),
+              PopupMenuItem(value: 'profile', child: Text('Profile')),
+              PopupMenuItem(value: 'settings', child: Text('Settings')),
+              PopupMenuItem(value: 'logout', child: Text('Log out')),
             ],
           ),
         ],
       ),
-      body: IndexedStack(
-        index: selectedIndex,
-        children: pages,
-      ),
+      body: IndexedStack(index: selectedIndex, children: pages),
       floatingActionButton: selectedIndex == 0
           ? FloatingActionButton(
               backgroundColor: appGreen,
               foregroundColor: Colors.white,
-              onPressed: () => _showMessage('New chat coming soon!'),
+              onPressed: () => showMessage('New chat coming soon!'),
               child: const Icon(Icons.chat),
             )
           : null,
@@ -159,7 +331,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildChats() {
+  Widget buildChats() {
     return ListView.builder(
       itemCount: names.length,
       itemBuilder: (context, index) {
@@ -176,16 +348,11 @@ class _HomePageState extends State<HomePage> {
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           subtitle: Text(messages[index]),
-          trailing: Text(
-            times[index],
-            style: const TextStyle(fontSize: 11),
-          ),
+          trailing: Text(times[index], style: const TextStyle(fontSize: 11)),
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (_) => ChatPage(name: names[index]),
-              ),
+              MaterialPageRoute(builder: (_) => ChatPage(name: names[index])),
             );
           },
         );
@@ -193,37 +360,28 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildCalls() {
+  Widget buildCalls() {
     return ListView(
       children: [
         for (final name in names)
           ListTile(
             leading: CircleAvatar(
               backgroundColor: appGreen,
-              child: Text(
-                name[0],
-                style: const TextStyle(color: Colors.white),
-              ),
+              child: Text(name[0], style: const TextStyle(color: Colors.white)),
             ),
             title: Text(name),
             subtitle: const Text('Tap to call'),
             trailing: IconButton(
               icon: const Icon(Icons.call, color: appGreen),
-              onPressed: () => _showMessage('Calling $name...'),
+              onPressed: () => showMessage('Calling $name...'),
             ),
           ),
       ],
     );
   }
-
-  void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
-  }
 }
 
-// CLIPS PAGE
+// ================= CLIPS PAGE =================
 
 class ClipsPage extends StatelessWidget {
   const ClipsPage({super.key});
@@ -237,21 +395,14 @@ class ClipsPage extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       children: [
         const Text(
-          'DartChat Clips',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
+          'LOOPIX Clips',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 5),
-        const Text(
-          'Photos and moments',
-          style: TextStyle(color: Colors.grey),
-        ),
+        const Text('Photos and moments', style: TextStyle(color: Colors.grey)),
         const SizedBox(height: 16),
         Card(
           clipBehavior: Clip.antiAlias,
-          elevation: 3,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -263,11 +414,9 @@ class ClipsPage extends StatelessWidget {
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
                     height: 280,
-                    width: double.infinity,
                     color: Colors.grey.shade300,
-                    child: const Icon(
-                      Icons.image_not_supported,
-                      size: 60,
+                    child: const Center(
+                      child: Icon(Icons.image_not_supported, size: 60),
                     ),
                   );
                 },
@@ -275,13 +424,10 @@ class ClipsPage extends StatelessWidget {
               const ListTile(
                 leading: CircleAvatar(
                   backgroundColor: appGreen,
-                  child: Icon(
-                    Icons.play_arrow,
-                    color: Colors.white,
-                  ),
+                  child: Icon(Icons.play_arrow, color: Colors.white),
                 ),
                 title: Text(
-                  'DartChat Clips',
+                  'LOOPIX Clips',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 subtitle: Text('Featured image'),
@@ -293,9 +439,9 @@ class ClipsPage extends StatelessWidget {
                     IconButton(
                       icon: const Icon(Icons.favorite_border),
                       onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Liked!')),
-                        );
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(const SnackBar(content: Text('Liked!')));
                       },
                     ),
                     IconButton(
@@ -329,7 +475,7 @@ class ClipsPage extends StatelessWidget {
   }
 }
 
-// CHAT PAGE
+// ================= CHAT PAGE =================
 
 class ChatPage extends StatefulWidget {
   final String name;
@@ -370,7 +516,8 @@ class _ChatPageState extends State<ChatPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.call),
-            onPressed: () => showAppMessage(context, 'Calling ${widget.name}...'),
+            onPressed: () =>
+                showAppMessage(context, 'Calling ${widget.name}...'),
           ),
           IconButton(
             icon: const Icon(Icons.videocam),
@@ -387,7 +534,7 @@ class _ChatPageState extends State<ChatPage> {
                 const Align(
                   alignment: Alignment.centerLeft,
                   child: ChatBubble(
-                    text: 'Hi! Welcome to DartChat.',
+                    text: 'Hi! Welcome to LOOPIX.',
                     isSent: false,
                   ),
                 ),
@@ -442,11 +589,7 @@ class ChatBubble extends StatelessWidget {
   final String text;
   final bool isSent;
 
-  const ChatBubble({
-    super.key,
-    required this.text,
-    required this.isSent,
-  });
+  const ChatBubble({super.key, required this.text, required this.isSent});
 
   @override
   Widget build(BuildContext context) {
@@ -463,7 +606,7 @@ class ChatBubble extends StatelessWidget {
   }
 }
 
-// GAMES PAGE
+// ================= GAMES PAGE =================
 
 class GamesPage extends StatelessWidget {
   const GamesPage({super.key});
@@ -474,39 +617,29 @@ class GamesPage extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       children: [
         const Text(
-          'DartChat Games',
+          'LOOPIX Games',
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 16),
-        _gameTile(
+        gameTile(
           context,
           'Rock Paper Scissors',
           Icons.sports_martial_arts,
           const RockPaperScissorsPage(),
         ),
-        _gameTile(
+        gameTile(
           context,
           'Number Guess',
           Icons.numbers,
           const NumberGuessPage(),
         ),
-        _gameTile(
-          context,
-          'Quick Quiz',
-          Icons.quiz,
-          const QuickQuizPage(),
-        ),
-        _gameTile(
-          context,
-          'Tic-Tac-Toe',
-          Icons.grid_3x3,
-          const TicTacToePage(),
-        ),
+        gameTile(context, 'Quick Quiz', Icons.quiz, const QuickQuizPage()),
+        gameTile(context, 'Tic-Tac-Toe', Icons.grid_3x3, const TicTacToePage()),
       ],
     );
   }
 
-  Widget _gameTile(
+  Widget gameTile(
     BuildContext context,
     String title,
     IconData icon,
@@ -518,28 +651,25 @@ class GamesPage extends StatelessWidget {
         title: Text(title),
         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => page),
-          );
+          Navigator.push(context, MaterialPageRoute(builder: (_) => page));
         },
       ),
     );
   }
 }
 
-// ROCK PAPER SCISSORS
+// ================= ROCK PAPER SCISSORS =================
 
 class RockPaperScissorsPage extends StatefulWidget {
   const RockPaperScissorsPage({super.key});
 
   @override
-  State<RockPaperScissorsPage> createState() =>
-      _RockPaperScissorsPageState();
+  State<RockPaperScissorsPage> createState() => _RockPaperScissorsPageState();
 }
 
 class _RockPaperScissorsPageState extends State<RockPaperScissorsPage> {
   final Random random = Random();
+
   String userChoice = '❔';
   String computerChoice = '❔';
   String result = 'Choose your move!';
@@ -589,10 +719,7 @@ class _RockPaperScissorsPageState extends State<RockPaperScissorsPage> {
                 for (final choice in choices)
                   ElevatedButton(
                     onPressed: () => play(choice),
-                    child: Text(
-                      choice,
-                      style: const TextStyle(fontSize: 30),
-                    ),
+                    child: Text(choice, style: const TextStyle(fontSize: 30)),
                   ),
               ],
             ),
@@ -603,7 +730,7 @@ class _RockPaperScissorsPageState extends State<RockPaperScissorsPage> {
   }
 }
 
-// NUMBER GUESS
+// ================= NUMBER GUESS =================
 
 class NumberGuessPage extends StatefulWidget {
   const NumberGuessPage({super.key});
@@ -684,14 +811,8 @@ class _NumberGuessPageState extends State<NumberGuessPage> {
               ),
             ),
             const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: checkGuess,
-              child: const Text('Check'),
-            ),
-            TextButton(
-              onPressed: restart,
-              child: const Text('Play Again'),
-            ),
+            ElevatedButton(onPressed: checkGuess, child: const Text('Check')),
+            TextButton(onPressed: restart, child: const Text('Play Again')),
           ],
         ),
       ),
@@ -699,7 +820,7 @@ class _NumberGuessPageState extends State<NumberGuessPage> {
   }
 }
 
-// QUICK QUIZ
+// ================= QUICK QUIZ =================
 
 class QuickQuizPage extends StatefulWidget {
   const QuickQuizPage({super.key});
@@ -773,8 +894,11 @@ class _QuickQuizPageState extends State<QuickQuizPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.emoji_events,
-                        size: 75, color: Colors.amber),
+                    const Icon(
+                      Icons.emoji_events,
+                      size: 75,
+                      color: Colors.amber,
+                    ),
                     const SizedBox(height: 16),
                     Text(
                       'Quiz completed!\nScore: $score/${questions.length}',
@@ -819,11 +943,7 @@ class _QuickQuizPageState extends State<QuickQuizPage> {
                     ),
                   if (answered) ...[
                     const SizedBox(height: 10),
-                    Text(
-                      questions[current]['answer'] == null
-                          ? ''
-                          : 'Correct answer: ${questions[current]['answer']}',
-                    ),
+                    Text('Correct answer: ${questions[current]['answer']}'),
                     const Spacer(),
                     ElevatedButton(
                       onPressed: nextQuestion,
@@ -841,7 +961,7 @@ class _QuickQuizPageState extends State<QuickQuizPage> {
   }
 }
 
-// TIC-TAC-TOE
+// ================= TIC-TAC-TOE =================
 
 class TicTacToePage extends StatefulWidget {
   const TicTacToePage({super.key});
@@ -912,10 +1032,7 @@ class _TicTacToePageState extends State<TicTacToePage> {
           children: [
             Text(
               result.isEmpty ? "Player $currentPlayer's turn" : result,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
             SizedBox(
@@ -923,8 +1040,7 @@ class _TicTacToePageState extends State<TicTacToePage> {
               child: GridView.builder(
                 shrinkWrap: true,
                 itemCount: 9,
-                gridDelegate:
-                    const SliverGridDelegateWithFixedCrossAxisCount(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
                 ),
                 itemBuilder: (context, index) {
@@ -956,7 +1072,7 @@ class _TicTacToePageState extends State<TicTacToePage> {
   }
 }
 
-// PROFILE PAGE
+// ================= PROFILE PAGE =================
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -976,22 +1092,19 @@ class ProfilePage extends StatelessWidget {
             const CircleAvatar(
               radius: 55,
               backgroundColor: appGreen,
-              child: Icon(
-                Icons.person,
-                size: 60,
-                color: Colors.white,
-              ),
+              child: Icon(Icons.person, size: 60, color: Colors.white),
             ),
             const SizedBox(height: 16),
             const Text(
-              'DartChat User',
+              'LOOPIX User',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 6),
-            const Text('Welcome to DartChat!'),
+            const Text('Welcome to LOOPIX!'),
             const SizedBox(height: 20),
             ElevatedButton.icon(
-              onPressed: () => showAppMessage(context, 'Edit profile coming soon!'),
+              onPressed: () =>
+                  showAppMessage(context, 'Edit profile coming soon!'),
               icon: const Icon(Icons.edit),
               label: const Text('Edit Profile'),
             ),
@@ -1002,7 +1115,7 @@ class ProfilePage extends StatelessWidget {
   }
 }
 
-// SETTINGS PAGE
+// ================= SETTINGS PAGE =================
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -1053,7 +1166,7 @@ class _SettingsPageState extends State<SettingsPage> {
           const Divider(),
           const ListTile(
             leading: Icon(Icons.info_outline),
-            title: Text('About DartChat'),
+            title: Text('About LOOPIX'),
             subtitle: Text('Version 1.0.0'),
           ),
         ],
@@ -1062,10 +1175,8 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 }
 
-// COMMON MESSAGE
+// ================= COMMON MESSAGE =================
 
 void showAppMessage(BuildContext context, String message) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text(message)),
-  );
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
 }

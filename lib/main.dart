@@ -565,15 +565,26 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       extendBody: true,
       appBar: AppBar(
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
+        centerTitle: false, 
+        title: const Row(
           children: [
-            const LXLogo(size: 32, withGlow: false),
-            const SizedBox(width: 9),
-            const Text('LOOPIX'),
+            LXLogo(size: 32, withGlow: false),
+            SizedBox(width: 9),
+            Text('LOOPIX'),
           ],
         ),
         actions: [
+          // Profile button placed to the left of the search icon
+          IconButton(
+            icon: const Icon(Icons.account_circle_rounded),
+            tooltip: 'Profile',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ProfilePage()),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.search_rounded),
             onPressed: () {
@@ -582,12 +593,7 @@ class _HomePageState extends State<HomePage> {
           ),
           PopupMenuButton<String>(
             onSelected: (value) {
-              if (value == 'profile') {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const ProfilePage()),
-                );
-              } else if (value == 'settings') {
+              if (value == 'settings') {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const SettingsPage()),
@@ -601,7 +607,6 @@ class _HomePageState extends State<HomePage> {
               }
             },
             itemBuilder: (_) => const [
-              PopupMenuItem(value: 'profile', child: Text('Profile')),
               PopupMenuItem(value: 'settings', child: Text('Settings')),
               PopupMenuItem(value: 'logout', child: Text('Log out')),
             ],
@@ -768,6 +773,8 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
+
 
 // ================= BOTTOM NAVIGATION =================
 
@@ -1148,7 +1155,8 @@ class GamesPage extends StatelessWidget {
       children: [
         const Text(
           'LOOPIX Games',
-          style: TextStyle(fontSize: 25, fontWeight: FontWeight.w900),
+          style: TextStyle(fontSize: 25, fontWeight: FontWeight.w900
+          ),
         ),
         const SizedBox(height: 8),
         const Text(

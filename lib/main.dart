@@ -348,23 +348,33 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final phoneController = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  bool obscurePassword = true;
 
   @override
   void dispose() {
-    phoneController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
     super.dispose();
   }
 
-  void continueWithPhone() {
-    final phone = phoneController.text.trim();
+  void signIn() {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
 
-    if (phone.length < 10) {
-      showAppMessage(context, 'Please enter a valid phone number.');
+    if (email.isEmpty || !email.endsWith('@gmail.com')) {
+      showAppMessage(context, 'Please enter a valid Gmail address.');
       return;
     }
 
-    // Demo navigation only. Real OTP authentication is not configured.
+    if (password.isEmpty) {
+      showAppMessage(context, 'Please enter your password.');
+      return;
+    }
+
+    // Demo navigation only. Real account authentication is not configured.
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (_) => const HomePage()),
@@ -425,7 +435,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     const SizedBox(height: 8),
                     const Text(
-                      'Choose how you want to continue',
+                      'Sign in to continue',
                       textAlign: TextAlign.center,
                       style: TextStyle(color: Colors.white70),
                     ),
@@ -445,15 +455,14 @@ class _LoginPageState extends State<LoginPage> {
                             },
                           ),
                           const SizedBox(height: 13),
-                         TextField(
+                          TextField(
                             controller: phoneController,
                             keyboardType: TextInputType.phone,
                             maxLength: 15,
                             decoration: const InputDecoration(
-                              counterText: '',
-                              prefixIcon: Icon(Icons.phone_android_rounded),
-                              labelText: 'Phone number',
-                              hintText: 'Enter your phone number',
+                              prefixIcon: Icon(Icons.email_outlined),
+                              labelText: 'Gmail address',
+                              hintText: 'Enter your Gmail address',
                             ),
                           ),
                           const SizedBox(height: 12),
@@ -485,8 +494,8 @@ class _LoginPageState extends State<LoginPage> {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(18),
                                 ),
-                              ), 
-                      ),
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -618,7 +627,7 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: selectedIndex == 0
           ? FloatingActionButton(
-              backgroundColor: violet,
+              backgroundColor: const Color.fromARGB(255, 0, 0, 0),
               foregroundColor: Colors.white,
               onPressed: () {
                 showAppMessage(context, 'New chat coming soon!');

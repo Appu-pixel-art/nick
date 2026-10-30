@@ -562,27 +562,17 @@ class _HomePageState extends State<HomePage> {
       buildCalls(),
     ];
 
-    appBar: AppBar(
-  centerTitle: false,
-  title: const Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      LXLogo(size: 32, withGlow: false),
-      SizedBox(width: 9),
-      Text(
-        'LOOPIX',
-        style: TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.w900,
-          letterSpacing: 1.5,
+    return Scaffold(
+      extendBody: true,
+      appBar: AppBar(
+        centerTitle: false, 
+        title: const Row(
+          children: [
+            LXLogo(size: 32, withGlow: false),
+            SizedBox(width: 9),
+            Text('LOOPIX'),
+          ],
         ),
-      ),
-    ],
-  ),
-  actions: [
-    // Keep your existing profile, search and menu buttons here.
-  ],
-)
         actions: [
           // Profile button placed to the left of the search icon
           IconButton(
@@ -629,7 +619,7 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: selectedIndex == 0
           ? FloatingActionButton(
-              backgroundColor: const Color.fromARGB(255, 136, 110, 110),
+              backgroundColor: const Color.fromARGB(255, 0, 0, 0),
               foregroundColor: Colors.white,
               onPressed: () {
                 showAppMessage(context, 'New chat coming soon!');

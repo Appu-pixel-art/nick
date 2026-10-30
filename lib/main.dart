@@ -445,8 +445,48 @@ class _LoginPageState extends State<LoginPage> {
                             },
                           ),
                           const SizedBox(height: 13),
-                          
+                         TextField(
+                            controller: phoneController,
+                            keyboardType: TextInputType.phone,
+                            maxLength: 15,
+                            decoration: const InputDecoration(
+                              counterText: '',
+                              prefixIcon: Icon(Icons.phone_android_rounded),
+                              labelText: 'Phone number',
+                              hintText: 'Enter your phone number',
                             ),
+                          ),
+                          const SizedBox(height: 12),
+                          gradientButton(
+                            text: 'Continue with phone number',
+                            icon: Icons.arrow_forward_rounded,
+                            onPressed: continueWithPhone,
+                          ),
+                          const SizedBox(height: 13),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 54,
+                            child: OutlinedButton.icon(
+                              onPressed: () {
+                                showAppMessage(
+                                  context,
+                                  'Facebook sign-in needs authentication setup.',
+                                );
+                              },
+                              icon: const Icon(
+                                Icons.facebook,
+                                color: Color(0xFF6CA8FF),
+                                size: 27,
+                              ),
+                              label: const Text('Continue with Facebook'),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                side: const BorderSide(color: lineWhite),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(18),
+                                ),
+                              ), 
+                      ),
                           ),
                         ],
                       ),
@@ -473,8 +513,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
-
-// ================= HOME PAGE =================
+        
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});

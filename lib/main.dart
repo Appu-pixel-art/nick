@@ -9,10 +9,10 @@ void main() {
 // ================= GLASS WAVE COLORS =================
 
 const Color navy = Color(0xFF061632);
-const Color deepBlue = Color(0xFF0B2D63);
-const Color blue = Color(0xFF1769E8);
+const Color deepBlue = Color.fromARGB(255, 129, 142, 214);
+const Color blue = Color.fromARGB(255, 168, 196, 103);
 const Color cyan = Color(0xFF00E5FF);
-const Color violet = Color(0xFF7C3AED);
+const Color violet = Color.fromARGB(255, 19, 15, 26);
 const Color lavender = Color(0xFFB9C8FF);
 const Color lineWhite = Color(0x55B9D9FF);
 
